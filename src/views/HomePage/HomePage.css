@@ -1,0 +1,73 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+/* button:hover {
+    background-color: #0056b3;
+} */
+
+table {
+    width: 80%;
+    border-collapse: collapse;
+}
+
+.grid-table {
+    height: 400;
+    width: 100%;
+    justify-content: center;
+    justify-items: center;
+}
+
+.grid-create-button {
+    margin: 20px 0;
+    margin-left: 84%;
+}
+
+.create-button {
+    background-color: #387478;
+}
+
+.edit-button {
+    background-color: #22177A;
+}
+
+.delete-button {
+    background-color: #AE445A;
+}
+
+.status-block {
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: white;
+    justify-items: center;
+}
+
+.status-active {
+    background-color: #387478;
+}
+
+.status-inactive {
+    background-color: #AE445A;
+}
+
+.status-draft {
+    background-color: #22177A;
+}

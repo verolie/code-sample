@@ -1,0 +1,23 @@
+.container-navbar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px;
+    margin-left: 0;
+    margin-right: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+}
+
+.grid-item-account {
+    justify-content: flex-end;
+    padding-right: 3%;
+}
+
+.menu-logout {
+    margin-left: 88%;
+    margin-top: 15px;
+}
+
+.icon {
+    cursor: pointer;
+}
