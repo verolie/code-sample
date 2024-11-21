@@ -14,57 +14,56 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm test`
+### The App
+#### Backend and Frontend Integration
+To ensure smooth operation, follow these steps:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Start the Backend:**
+Make sure the backend is running before the frontend.
 
-### `npm run build`
+**Run the Frontend:**
+Access the login page, enter credentials, and verify that the backend returns a valid token.
+Check if the token is stored in the browser's cookies and if the username is saved in local storage.
+Navigate through the Home Page, Create Product page, and Edit Product page to verify that the status updates (e.g., changing a product to inactive or draft) work as intended.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+remember from the backend repo that the product have 3 status:
+- active
+- draft
+- inactive
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### App Structure Overview
+**Login Page:**
+- The user logs in using credentials.
+- On successful login, the backend returns a token:
+  - The auth token is stored in cookies.
+  - The username is saved in local storage.
+-The user is then redirected to the Home Page.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Home Page:**
+- Displays a list of all products with their status (active, draft, or inactive).
+- The user has options to:
+- Create a new product (navigates to the Create Product page).
+- Edit an existing product (navigates to the Edit Product page for that product).
+- Delete a product:
+  - If the product is active, clicking delete changes its status to inactive.
+  - If the product is in draft status, clicking delete performs a hard delete (removes it from the database).
+ 
+**Create Product Page:**
+- A form is available to enter product details.
+- Two options for saving:
+  - Save as Draft: The product status is set to draft.
+  - Submit: The product status is set to active.
+  - After saving or submitting, the user is redirected to the Home Page.
 
-### `npm run eject`
+**Create Product Page:**
+- A form is available to enter product details.
+- Two options for saving:
+  - Save as Draft: The product status is set to draft.
+  - Submit: The product status is set to active.
+- After saving or submitting, the user is redirected to the Home Page.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**Navigation and User Actions:**
+- NavBar includes a user menu:
+  - Clicking the username in the NavBar logs out the user.
+  - It clears the auth token from cookies and username from local storage.
+  - The user is then redirected back to the Login Page.
