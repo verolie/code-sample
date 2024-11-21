@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
@@ -11,10 +11,17 @@ import "./style.css";
 
 function NavBar() {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [username, setUsername] = useState("Guest"); // Default username
   const navigate = useNavigate();
   const open = Boolean(anchorEl);
 
-  const username = "John Doe"; // Replace with the actual username if dynamic
+  useEffect(() => {
+    // Fetch username from localStorage
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []); // Empty dependency array to run only once
 
   const handleClickUser = (event) => {
     setAnchorEl(event.currentTarget);
@@ -25,7 +32,9 @@ function NavBar() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
+    document.cookie =
+      "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    localStorage.removeItem("username");
     navigate("/login");
   };
 

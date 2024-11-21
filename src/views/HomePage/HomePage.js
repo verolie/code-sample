@@ -1,72 +1,102 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import NavBar from "../../components/navbar/navbar";
 import formatDate from "./function/formatDate";
+import getStockProduct from "./function/getStockProduct";
+import deleteStockProduct from "./function/deleteStockProduct";
+import AppContext from "../../context/AppContext";
 
 function HomePage() {
   const navigate = useNavigate();
 
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      productName: "John Doe",
-      quantity: 30,
-      status: "active",
-      updatedBy: 1,
-      updatedAt: "2024-11-19T09:23:55.284994+07:00",
-    },
-    {
-      id: 2,
-      productName: "Jane Smith",
-      quantity: 25,
-      status: "draft",
-      updatedBy: 1,
-      updatedAt: "2024-11-19T09:23:55.284994+07:00",
-    },
-    {
-      id: 3,
-      productName: "Alice Johnson",
-      quantity: 28,
-      status: "inactive",
-      updatedBy: 1,
-      updatedAt: "2024-11-19T09:23:55.284994+07:00",
-    },
-  ]);
+  const [rows, setRows] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalData, setTotalData] = useState();
+  const [authToken, setAuthToken] = useState();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const { startLoading, stopLoading } = useContext(AppContext); // Access context
+
+  const fetchStockProducts = async () => {
+    // Get authToken from cookies
+    const cookies = document.cookie;
+    const token = cookies
+      .split("; ")
+      .find((row) => row.startsWith("authToken="))
+      ?.split("=")[1];
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    setAuthToken(token);
+
+    try {
+      startLoading();
+      const dataRequest = {
+        currentPage,
+        rowsPerPage,
+      };
+
+      const data = await getStockProduct(token, dataRequest);
+
+      setRows(data.detail || []);
+      setTotalPages(data.total_page || 1);
+      setTotalData(data.total);
+    } catch (error) {
+      alert(error);
+    } finally {
+      stopLoading();
+    }
+  };
+
+  useEffect(() => {
+    fetchStockProducts();
+  }, [currentPage]); // Refetch when page or rowsPerPage changes
 
   const handleCreate = () => {
-    console.log("Create button clicked");
+    navigate("/create-product");
   };
 
   const handleEdit = (id) => {
     console.log("Edit", id);
+    navigate(`/detail-product/${id}`);
   };
 
-  const handleDelete = (id) => {
-    console.log("Delete", id);
-    setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+  const openModal = (StockProductID) => {
+    setSelectedId(StockProductID);
+    setIsModalOpen(true);
   };
 
-  useEffect(() => {
-    const cookies = document.cookie;
-    const authToken = cookies
-      .split("; ")
-      .find((row) => row.startsWith("authToken="));
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedId(null);
+  };
 
-    if (!authToken) {
-      navigate("/login");
+  const confirmDelete = async (event) => {
+    event.preventDefault();
+    try {
+      await deleteStockProduct(authToken, selectedId);
+      closeModal();
+      fetchStockProducts();
+    } catch (error) {
+      console.error("Error deleting product:", error);
     }
-  }, [navigate]);
+  };
 
-  // Function to get the background color based on the status
   const getStatusClass = (status) => {
     switch (status) {
       case "active":
-        return "status-active"; // Green
+        return "status-active";
       case "inactive":
-        return "status-inactive"; // Red
+        return "status-inactive";
       case "draft":
-        return "status-draft"; // Blue
+        return "status-draft";
       default:
         return "";
     }
@@ -76,7 +106,6 @@ function HomePage() {
     <div>
       <NavBar />
       <h1>Home Page</h1>
-      <div>Welcome to the Home Page!</div>
 
       {/* Create button */}
       <div className="grid-create-button">
@@ -100,27 +129,27 @@ function HomePage() {
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.productName}</td>
-                <td>{row.quantity}</td>
-                <td>{row.updatedBy || "N/A"}</td>
-                <td>{row.updatedAt ? formatDate(row.updatedAt) : "N/A"}</td>
+              <tr key={row.StockProductID}>
+                <td>{row.ProductName}</td>
+                <td>{row.Quantity}</td>
+                <td>{row.UpdatedBy || "N/A"}</td>
+                <td>{row.UpdatedAt ? formatDate(row.UpdatedAt) : "N/A"}</td>
                 <td>
                   <span
-                    className={`status-block ${getStatusClass(row.status)}`}
+                    className={`status-block ${getStatusClass(row.Status)}`}
                   >
-                    {row.status}
+                    {row.Status}
                   </span>
                 </td>
                 <td>
                   <button
-                    onClick={() => handleEdit(row.id)}
+                    onClick={() => handleEdit(row.StockProductID)}
                     className="edit-button"
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(row.id)}
+                    onClick={() => openModal(row.StockProductID)}
                     className="delete-button"
                   >
                     Delete
@@ -131,6 +160,46 @@ function HomePage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      <div className="pagination">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          Prev
+        </button>
+        <span style={{ marginRight: "10px" }}>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
+      </div>
+      <p className="pagination">Total Data: {totalData}</p>
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to delete this item?</p>
+            <div className="modal-buttons">
+              <button onClick={confirmDelete} className="confirm-button">
+                Yes, Delete
+              </button>
+              <button onClick={closeModal} className="cancel-button">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
